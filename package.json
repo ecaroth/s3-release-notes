@@ -13,9 +13,10 @@
   },
   "dependencies": {
     "app-root-dir": "^1.0.2",
-    "argparse": "^1.0.9",
+    "colors": "^1.1.2",
+    "commander": "^2.9.0",
     "editor": "^1.0.0",
-    "joi": "^10.0.1",
+    "liftoff": "^2.3.0",
     "marked": "^0.3.6",
     "marked-terminal": "^2.0.0",
     "prompt": "^1.0.0",
