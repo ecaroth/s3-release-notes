@@ -33,8 +33,8 @@ s3-releaes-notes <command> [options]
 ```
 Available commands are:
 
-|Command|Opts|Description|
-|-|-|-|
+| Command | Opts | Description |
+| -------------- | -------------- | -------------- |
 | **release** | appversion, date | Add/update a version in releases (and bump current version if needed) |
 | **remove** | appversion | Remove a version from releases|
 | **list** | | List currently published versions |
@@ -45,8 +45,8 @@ Available commands are:
 
 All options are optional, but those available to commands are listed in the table above:
 
-|Option|Default|Description|
-|-|-|-|
+| Option | Default | Description |
+ -------------- | -------------- | -------------- |
 | `--appversion`, `-av` | Current version in project's package.json | Version of hte app you wish to perform the command for |
 | `--date`, `-d` | Today's date | Date you wish to apply release as (format is YYYY-MM-DD)|
 | `--configfile`, `-cf` | `s3ReleaseNotes.json` in project root | Location of s3-release-notes config file
