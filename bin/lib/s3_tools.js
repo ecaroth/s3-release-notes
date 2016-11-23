@@ -10,10 +10,10 @@ exports.new = function(config){
 		current = null;
 
 	var fs = require('fs');
-	//var fs = new S3FS(config.s3_bucket, options);
+	//var fs = new S3FS(config.s3Bucket, options);
 
 	function _key_for_version_file(){
-		return (config.key_prefix || "") + VERSIONS_FILE;
+		return (config.keyPrefix || "") + VERSIONS_FILE;
 	}
 
 	function _update_version_info(version, notes, date, cb){

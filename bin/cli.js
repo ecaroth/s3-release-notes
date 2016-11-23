@@ -31,7 +31,7 @@ const s3ReleaseNotes = new Liftoff({
 	processTitle: "s3-release-notes",
 	moduleName: "s3-release-notes",
 	configFiles: {
-	    '.s3ReleaseNotes': {
+	    's3ReleaseNotes.json': {
 	      up: {
 	        path: '.',
 	        findUp: true
@@ -54,7 +54,7 @@ const loadProgramAppVersion = function(){
 //load and validate the config file
 const loadAndValidateConfig = function(configFilePath){
 	config = require(configFilePath);
-	if(!config.s3_bucket) Utils.fatalError("Invalid config file - no s3_bucket specified!");
+	if(!config.s3Bucket) Utils.fatalError("Invalid config file - no s3_bucket specified!");
 };
 
 //validate the provided or default app version
@@ -74,7 +74,7 @@ const invoke = function (env) {
 
 	validateAppVersion();
 
-	switch(cmdValue){
+	switch(cmdValue.toLowerCase()){
 		case 'release':
 			require("./lib/release.js").run(config, program.appversion, program.date);
 			break;

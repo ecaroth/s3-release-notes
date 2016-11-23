@@ -1,6 +1,7 @@
 const 	s3v = require('./s3_tools.js'),
 		Utils = require('./utils.js'),
 		Editor = require('editor'),
+		Semver = require('semver'),
 		fs = require('fs');
 
 var s3Version = null;
@@ -18,8 +19,17 @@ exports.run = function(config, version, date){
 
 		//fetch existing data for this version & generate temp file w/ markdown
 		var existing = s3Version.getExisting(version),
+			current = s3Version.getCurrent(),
 			date = date || existing.date || (new Date().toJSON().slice(0,10)),
 			msg = "Confirm RELEASE for version " + version + " (on " + date + ")";
+
+		if( !Semver.gt(version, current) && version != current){
+			var msg2 = "You selected a version previous to current ("+current+")"
+			if(!existing.date){
+				msg2 += ", and which has not been previously released";
+			}
+			Utils.console.notice(msg2);	
+		}
 
 		//get terminal confirm from user
 		Utils.terminalConfirm( msg, function(){
