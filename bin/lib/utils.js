@@ -1,3 +1,5 @@
+"use strict";
+
 const 	Readline = require('readline'),
 		Marked = require('marked'),
 		TerminalRenderer = require('marked-terminal'),
@@ -11,33 +13,33 @@ Marked.setOptions({
   renderer: new TerminalRenderer()
 });
 
-const createCommandLineInterface = function(){
+function createCommandLineInterface(){
 	cmdLine = Readline.createInterface({
 	  input: process.stdin,
 	  output: process.stdout
 	});
-};
+}
 
-const closeCommandLineInterface = function(){
+function closeCommandLineInterface(){
 	cmdLine.close();
-};
+}
 
 //fatal error occured, halt CLI execution
-exports.fatalError = function(msg){
+exports.fatalError = (msg) => {
 	exports.console.br();
 	exports.console.error(msg);
 	process.exit();
 };
 
 //successful outcome - print as such and exit process
-exports.success = function(msg){
+exports.success = (msg) => {
 	exports.console.success(msg);
 	process.exit();
 };
 
 //create a temporary file for this version and populate it w/ existing notes
-exports.setupTempFile = function(notes, version){
-	var fname = "./tmp/v" + version + " ("+(new Date().getTime())+").tmp";
+exports.setupTempFile = (notes, version) => {
+	var fname = `./tmp/v${version} (${(new Date().getTime())}).tmp`;
 	if (!fs.existsSync("./tmp")){
 	    fs.mkdirSync("./tmp");
 	}
@@ -49,14 +51,14 @@ exports.setupTempFile = function(notes, version){
 exports.exitGraceful = function(){
 	console.log("Exiting...".italic);
 	process.exit();
-}
+};
 
 //get confirmation from user of action
 exports.terminalConfirm = function(msg, yes_cb, no_cb){
 	
-	msg = ">> " + msg +" - ("+"yes".underline.bold+"/"+"no".underline.bold+"):  ";
+	msg = `>> ${msg} - (${"yes".underline.bold}/"${"no".underline.bold}):  `;
 
-	function inputResponse(resp){
+	function _inputResponse(resp){
 		resp = resp.toLowerCase();
 		closeCommandLineInterface();
 
@@ -66,62 +68,62 @@ exports.terminalConfirm = function(msg, yes_cb, no_cb){
 			return no_cb();
 		}
 		msg = "Invalid response, try again: ";
-		getInput(msg);
+		_getInput(msg);
 	}
 
-	function getInput(msg){
+	function _getInput(msg){
 		createCommandLineInterface();
-		cmdLine.question(msg, inputResponse);
+		cmdLine.question(msg, _inputResponse);
 	}
 
-	getInput(msg);
+	_getInput(msg);
 };
 
 //close temp file
-exports.removeTempFile = function(fpath){
+exports.removeTempFile = (fpath) => {
 	try{
 		fs.unlinkSync(fpath);
 	}catch(e){}
 };
 
 //print text to console as formatted markdown
-exports.outputAsMarkdown = function(text){
+exports.outputAsMarkdown = (text) => {
 	console.log(Marked(text));
 };
 
 //run a cleanup function on exit
-exports.cleanupHandler = function(exitHandler){
+exports.cleanupHandler = (exitHandler) =>{
 	//do something when app is closing
-	process.on('exit', exitHandler.bind(null,{cleanup:true}));
+	process.on('exit', exitHandler.bind(null, {cleanup:true}));
 	//catches ctrl+c event
 	process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 	//catches uncaught exceptions
 	process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
-}
+};
 
 exports.console = {
-	note: function(str){
-		var str = "::"+str+"::";
-		console.log(str.bold.green)
+	note: (str) => {
+		str = `::${str}::`;
+		console.log(str.bold.green);
 	},
-	notice: function(str){
-		console.log("NOTE".yellow + " - " + str);
+	notice: (str) => {
+		console.log(`${"NOTE".yellow} - ${str}`);
 	},
-	error: function(str){
-		console.log("ERROR".red + " - " + str);
+	error: (str) => {
+		console.log(`${"ERROR".red} - ${str}`);
 	},
-	success: function(str){
-		console.log("SUCCESS".green + " - " + str);
+	success: (str) => {
+		console.log(`${"SUCCESS".green} - ${str}`);
 	},
 	status: function(str, extra){
-		var s = str+"...";
-		if(extra) s += " " + ("(" + extra + ")").dim.italic;
+		var s = `${str}...`; 
+		if(extra) s += " " + (`(${extra})`).dim.italic;
 		console.log(s);
 	},
-	hr: function(){
+	hr: () => {
 		console.log("---------------------------------".dim);
 	},
-	br: function(){
+	br: () => {
 		console.log("");
 	}
 };

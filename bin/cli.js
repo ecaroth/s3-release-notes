@@ -6,7 +6,15 @@ const 	Liftoff = require('liftoff'),
 
 
 const	packageJson = require('../package.json'), 		//s3-release-note app's package json defs
-		appRootDir = require('app-root-dir').get();		//root dir of the user's app
+		appRootDir = require('app-root-dir').get(),		//root dir of the user's app
+		availableCommands = Object.freeze([				//commands supported by the CLI
+			'release',
+			'preview',
+			'current',
+			'remove',
+			'list'
+		]);
+
 var 	cmdValue = "release", 							//default sub command if none provided
 		config = null									//config data as loaded from config file
 
@@ -17,8 +25,13 @@ const program = require("commander")
 		.option('-cf, --configfile <path>', 'Optional path to config file')
 		.option('-av, --appversion <version>', 'Optional app version to address')
 		.option('-d, --date <date>', 'Date to mark for operation', null)
-		.action(function (cmd, env) {
-			 cmdValue = cmd;
+		.option('-aws_key, --aws_access_key_id', 'AWS access key ID')
+		.option('-aws_secret, --aws_secret_access_key', 'AWS secret key')
+		.action((cmd, env) => {
+			 cmdValue = cmd.toLowerCase();
+			 if(availableCommands.indexOf(cmdValue) === -1){
+			 	Utils.fatalError(`Invalid command [${cmdValue}] specified!`);
+			 }
 		});
 program.parse(process.argv);
 
@@ -41,9 +54,9 @@ const s3ReleaseNotes = new Liftoff({
 });
 
 //load the package.json file for the project from the root dir
-const loadProgramAppVersion = function(){
+const loadProgramAppVersion = () => {
 	try{
-		var packageJson = require( path.relative(__dirname, appRootDir + "/package.json"));
+		let packageJson = require( path.relative(__dirname, appRootDir + "/package.json"));
 	}catch(e){
 		Utils.fatalError("No package.json file in project root!");
 	}
@@ -52,20 +65,20 @@ const loadProgramAppVersion = function(){
 }
 
 //load and validate the config file
-const loadAndValidateConfig = function(configFilePath){
+const loadAndValidateConfig = (configFilePath) => {
 	config = require(configFilePath);
 	if(!config.s3Bucket) Utils.fatalError("Invalid config file - no s3_bucket specified!");
 };
 
 //validate the provided or default app version
-const validateAppVersion = function(){
+const validateAppVersion = () => {
 	if(!Semver.valid(program.appversion)){
 		Utils.fatalError("Invalid version - "+program.appversion+" is not valid semver!");
 	}
 }
 
 //invocation function for the launcher
-const invoke = function (env) {
+const invoke = (env) => {
 	if(!env.configPath) return Utils.fatalError("No config file found!");
 	
 	if(!program.appversion) loadProgramAppVersion();
@@ -74,23 +87,16 @@ const invoke = function (env) {
 
 	validateAppVersion();
 
-	switch(cmdValue.toLowerCase()){
-		case 'release':
-			require("./lib/release.js").run(config, program.appversion, program.date);
-			break;
-		case 'preview':
-			require("./lib/preview.js").run(config, program.appversion);
-			break;
-		case 'current':
-			require("./lib/current.js").run(config);
-			break;
-		case 'remove':
-			require("./lib/remove.js").run(config, program.appversion);
-			break;
-		case 'list':
-			require("./lib/list.js").run(config);
-			break;
-	}
+	let opts = {
+		awsAccessKeyId: program.aws_access_key_id || process.env.AWS_ACCESS_KEY_ID,
+		awsSecretKey: program.aws_secret_access_key || process.env.AWS_SECRET_ACCESS_KEY,
+		appVersion: program.appversion,
+		data: program.date
+	};
+
+	if(!opts.awsAccessKeyId || !opts.awsSecretKey) Utils.fatalError("Missing/invalid AWS access credentials supplied!");
+
+	require(`./lib/${cmdValue}.js`).run(config, opts);
 };
 
 //initaalize Liftoff

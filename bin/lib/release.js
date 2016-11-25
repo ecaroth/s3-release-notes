@@ -1,4 +1,6 @@
-const 	s3v = require('./s3_tools.js'),
+"use strict";
+
+const 	s3v = require('./s3_version.js'),
 		Utils = require('./utils.js'),
 		Editor = require('editor'),
 		Semver = require('semver'),
@@ -6,25 +8,25 @@ const 	s3v = require('./s3_tools.js'),
 
 var s3Version = null;
 
-exports.run = function(config, version, date){
+exports.run = (config, opts) => {
 
 	Utils.console.br();
 	Utils.console.note("After confirmation, an editor will open - enter/edit the (markdown supported) releae notes, then save/exit the file to continue");
 	
 	//initialize local or S3 file repo
-	s3Version = s3v.new(config);
+	const s3Version = s3v.create(config, opts.awsAccessKeyId, opts.awsSecretKey);
 
 	//load & parse existing version info
-	s3Version.loadVersionInfo(function(){
+	s3Version.loadVersionInfo(() => {
 
 		//fetch existing data for this version & generate temp file w/ markdown
-		var existing = s3Version.getExisting(version),
+		let existing = s3Version.getExisting(opts.version),
 			current = s3Version.getCurrent(),
-			date = date || existing.date || (new Date().toJSON().slice(0,10)),
-			msg = "Confirm RELEASE for version " + version + " (on " + date + ")";
+			date = opts.date || existing.date || (new Date().toJSON().slice(0,10)),
+			msg = `Confirm RELEASE for version ${opts.version} (on ${date})`;
 
-		if( !Semver.gt(version, current) && version != current){
-			var msg2 = "You selected a version previous to current ("+current+")"
+		if( !Semver.gt(opts.version, current) && opts.version != current){
+			let msg2 = `You selected a version previous to current (${current})`;
 			if(!existing.date){
 				msg2 += ", and which has not been previously released";
 			}
@@ -32,21 +34,21 @@ exports.run = function(config, version, date){
 		}
 
 		//get terminal confirm from user
-		Utils.terminalConfirm( msg, function(){
+		Utils.terminalConfirm( msg, () => {
 			
-			var notes = existing.notes,
-				fname = Utils.setupTempFile( notes, version );
+			let notes = existing.notes,
+				fname = Utils.setupTempFile( notes, opts.version );
 
 			//bind cleanup handler on exit to remove tempfile
-			Utils.cleanupHandler(function(){
+			Utils.cleanupHandler(() => {
 				Utils.removeTempFile(fname);
-			})
+			});
 
 			Utils.console.status("Opening editor", "save & exit the TMP file in editor to continue");
 			
-			function doEdit(){
+			function _doEdit(){
 				//open $EDITOR w/ temp file	
-				Editor(fname, function (code, sig) {
+				Editor(fname, (code, sig) => {
 					notes = fs.readFileSync(fname, 'utf8');
 
 					Utils.console.br();
@@ -55,22 +57,22 @@ exports.run = function(config, version, date){
 					Utils.outputAsMarkdown(notes);
 					Utils.console.hr();
 
-					var msg = "Would you like to push the above markdown as the release notes for version "+version+"?";
-					Utils.terminalConfirm( msg, editsConfirmed, doEdit);
-				})
-			}
-
-			function editsConfirmed(code, sig){
-				//update version for this file
-			    s3Version.update(version, notes, date, function(err){
-					if(err) Utils.fatalError("Updating version "+version+" - unable to write to s3 file!");
-
-					Utils.console.br();
-					Utils.success("Version "+version+" updated successfully!")
+					let msg = `Would you like to push the above markdown as the release notes for version ${opts.version}?`;
+					Utils.terminalConfirm( msg, _editsConfirmed, _doEdit);
 				});
 			}
 
-			doEdit();
+			function _editsConfirmed(code, sig){
+				//update version for this file
+			    s3Version.update(opts.version, notes, date, (err) => {
+					if(err) Utils.fatalError(`Updating version ${opts.version} - unable to write to s3 file!`);
+
+					Utils.console.br();
+					Utils.success(`Version ${opts.version} updated successfully!`);
+				});
+			}
+
+			_doEdit();
 
 		}, Utils.exitGraceful );
 

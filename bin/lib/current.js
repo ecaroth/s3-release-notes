@@ -1,17 +1,18 @@
-const 	s3v = require('./s3_tools.js'),
+"use strict";
+
+const 	s3v = require('./s3_version.js'),
 		Utils = require('./utils.js');
 
-exports.run = function(config){
-	s3Version = s3v.new(config);
+exports.run = (config, opts) => {
+	const s3Version = s3v.create(config, opts.awsAccessKeyId, opts.awsSecretKey);
 
-	s3Version.loadVersionInfo(function(){
-		var current = s3Version.getCurrent();
+	s3Version.loadVersionInfo(() => {
+		let current = s3Version.getCurrent(),
+			existing = s3Version.getExisting(current);
 
 		if(!current) Utils.fatalError("No releases are present yet!");
-			
-		var existing = s3Version.getExisting(current);
 
-		Utils.console.note("Current release version is "+current+" (released "+existing.date+")");
+		Utils.console.note(`Current release version is ${current} (released ${existing.date})`);
 		process.exit();
 	});	
 };

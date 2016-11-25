@@ -1,29 +1,30 @@
-var S3FS = require('s3fs'),
+"use strict";
+
+const S3FS = require('s3fs'),
 	Semver = require('semver');
 
 const 	VERSIONS_FILE = "versions.json",
 		VERSION_BASE = { 'versions': [], 'current': null };
 
-exports.new = function(config){
+exports.create = (config, awsKey, awsSecret) => {
 
 	var versions = [],
 		current = null;
 
-	var fs = require('fs');
-	//var fs = new S3FS(config.s3Bucket, options);
+	//const fs = require('fs');
+	const fs = new S3FS(config.s3Bucket, {accessKeyId: awsKey, secretAccessKey: awsSecret});
 
 	function _key_for_version_file(){
 		return (config.keyPrefix || "") + VERSIONS_FILE;
 	}
 
 	function _update_version_info(version, notes, date, cb){
-		var existing = _get_existing(version);
-
-		var obj = {
-			notes: notes,
-			version: version,
-			date: date || existing.date || (new Date().toJSON().slice(0,10)),
-		}
+		let existing = _get_existing(version),
+			obj = {
+				notes: notes,
+				version: version,
+				date: date || existing.date || (new Date().toJSON().slice(0,10)),
+			};
 		if(existing.index !== -1){
 			versions[existing.index] = obj;
 		}else{
@@ -47,12 +48,12 @@ exports.new = function(config){
 	}
 
 	function _get_existing(version){
-		for(var i=0; i<versions.length; i++){
+		for(let i=0; i<versions.length; i++){
 			if(versions[i].version == version){
 				return  {date: versions[i].date, notes: versions[i].notes, index:i};
 			}
 		}
-		return {date:null, notes:null, index:-1}
+		return { date: null, notes: null, index: -1 };
 	}
 
 	function _write_version_info(cb){
@@ -61,7 +62,7 @@ exports.new = function(config){
 			return !Semver.gt(a.version, b.version);
 		});
 
-		var data = {
+		let data = {
 			versions: versions,
 			current: versions.length > 0 ? versions[0].version : null
 		};
@@ -74,7 +75,7 @@ exports.new = function(config){
 	}
 
 	function _remove(version, cb){
-		var existing = _get_existing(version);
+		let existing = _get_existing(version);
 		if(existing.index !== -1){
 			versions.splice(existing.index, 1);
 		}

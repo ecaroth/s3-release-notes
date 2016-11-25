@@ -1,33 +1,35 @@
-const 	s3v = require('./s3_tools.js'),
+"use strict";
+
+const 	s3v = require('./s3_version.js'),
 		Utils = require('./utils.js');
 
-exports.run = function(config, version){
-	s3Version = s3v.new(config);
+exports.run = (config, opts) => {
+	const s3Version = s3v.create(config, opts.awsAccessKeyId, opts.awsSecretKey);
 
-	s3Version.loadVersionInfo(function(){
-		var existing = s3Version.getExisting(version);
+	s3Version.loadVersionInfo(() => {
+		let existing = s3Version.getExisting(opts.version),
+			current = s3Version.getCurrent();
 
 		if(!existing.date){
-			Utils.fatalError("Verion "+version+" does not exist in releases!");
+			Utils.fatalError(`Verion ${opts.version} does not exist in releases!`);
 		}
 
-		var current = s3Version.getCurrent();
-
 		Utils.console.br();
-		Utils.console.note("Removing released version "+ version + (current==version ? " (current)":"") );
+		Utils.console.note(`Removing released version ${opts.version} ${current==opts.version ? " (current)" : ""}`);
 
-		var msg = "Are you sure you wish to remove version " + version;
+		let msg = `Are you sure you wish to remove version ${opts.version}?`;
+
 		//get terminal confirm from user
-		Utils.terminalConfirm( msg, function(){
+		Utils.terminalConfirm( msg, () => {
 
-			s3Version.remove(version, function(err){
-				if(err) Utils.fatalError("Removing version "+version+" - unable to write to s3 file!");
+			s3Version.remove(opts.version, (err) => {
+				if(err) Utils.fatalError(`Removing version ${opts.version} - unable to write to s3 file!`);
 
 				current = s3Version.getCurrent();
 				Utils.console.br();
-				Utils.success("Version "+version+" removed successfully!");
+				Utils.success(`Version ${opts.version} removed successfully!`);
 				if(current){
-					Utils.notice("Current version is "+current);
+					Utils.notice(`Current version is ${current}`);
 				}else{
 					Utils.notice("There is no current releae version!");
 				}
