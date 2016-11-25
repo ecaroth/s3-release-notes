@@ -76,14 +76,14 @@ s3ReleaseNotes("https://my-bucket.s3.amazonaws.com/", function(s3ReleaesNotesIns
 ``` 
 The consumer instance object exposes the following functions:
 
-> #### .getCurrent()
-> Get the current released version of the application
+#### .getCurrent()
+Get the current released version of the application
 
-> #### .getVersions()
-> Get the full list of all released versions
+#### .getVersions()
+Get the full list of all released versions
 
-> #### .getVersionInfo(version)
-> Get information for the specified version in the format `{version:"1.2.3", notes: "markup release notes", date: "2016-0101"}`
+#### .getVersionInfo(version)
+Get information for the specified version in the format `{version:"1.2.3", notes: "markup release notes", date: "2016-0101"}`
 
-> #### .getNewerVersions(version)
-> Get all released versions more recent than the supplied version in the format `['4.5.6','4.3.1',...]`
+#### .getNewerVersions(version)
+Get all released versions more recent than the supplied version in the format `['4.5.6','4.3.1',...]`
