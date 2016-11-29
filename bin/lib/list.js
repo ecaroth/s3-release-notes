@@ -11,7 +11,7 @@ exports.run = (config, opts) => {
 		let versions = s3Version.getVersions(),
 			current = s3Version.getCurrent();
 
-		if(versions.length==0) utils.fatalError("No releases are currently published");
+		if(versions.length==0) Utils.fatalError("No releases are currently published");
 
 		
 		Utils.console.br();

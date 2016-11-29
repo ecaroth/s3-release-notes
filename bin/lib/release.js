@@ -9,6 +9,8 @@ const 	s3v = require('./s3_version.js'),
 var s3Version = null;
 
 exports.run = (config, opts) => {
+	console.log("CONFIG", config);
+	console.log("OPTS", opts);
 
 	Utils.console.br();
 	Utils.console.note("After confirmation, an editor will open - enter/edit the (markdown supported) releae notes, then save/exit the file to continue");
@@ -25,7 +27,7 @@ exports.run = (config, opts) => {
 			date = opts.date || existing.date || (new Date().toJSON().slice(0,10)),
 			msg = `Confirm RELEASE for version ${opts.version} (on ${date})`;
 
-		if( !Semver.gt(opts.version, current) && opts.version != current){
+		if( current && !Semver.gt(opts.version, current) && opts.version != current){
 			let msg2 = `You selected a version previous to current (${current})`;
 			if(!existing.date){
 				msg2 += ", and which has not been previously released";
@@ -64,9 +66,7 @@ exports.run = (config, opts) => {
 
 			function _editsConfirmed(code, sig){
 				//update version for this file
-			    s3Version.update(opts.version, notes, date, (err) => {
-					if(err) Utils.fatalError(`Updating version ${opts.version} - unable to write to s3 file!`);
-
+			    s3Version.update(opts.version, notes, date, () => {
 					Utils.console.br();
 					Utils.success(`Version ${opts.version} updated successfully!`);
 				});

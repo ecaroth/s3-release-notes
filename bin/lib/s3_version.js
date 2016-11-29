@@ -11,6 +11,8 @@ exports.create = (config, awsKey, awsSecret) => {
 	var versions = [],
 		current = null;
 
+	const AWS_OPTS = {accessKeyId: awsKey, secretAccessKey: awsSecret};
+	console.log("OPTS", AWS_OPTS);
 	//const fs = require('fs');
 	const fs = new S3FS(config.s3Bucket, {accessKeyId: awsKey, secretAccessKey: awsSecret});
 
@@ -70,7 +72,8 @@ exports.create = (config, awsKey, awsSecret) => {
 		current = data.current;
 
 		fs.writeFile(_key_for_version_file(), JSON.stringify(data), function (err) {
-			cb(err);
+			if(err) Utils.fatalError(`Updating version ${opts.version} - unable to write to s3 file. Please check bucket permissions and name!`);
+			cb();
 		});
 	}
 

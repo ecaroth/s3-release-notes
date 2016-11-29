@@ -2,7 +2,8 @@
 const 	Liftoff = require('liftoff'),
 		Semver = require('semver'),
 		Utils = require('./lib/utils.js'),
-	  	path = require('path');
+	  	path = require('path'),
+	  	fs = require('fs');
 
 
 const	packageJson = require('../package.json'), 		//s3-release-note app's package json defs
@@ -43,14 +44,10 @@ const s3ReleaseNotes = new Liftoff({
 	name: "s3-release-notes",
 	processTitle: "s3-release-notes",
 	moduleName: "s3-release-notes",
-	configFiles: {
-	    's3ReleaseNotes.json': {
-	      up: {
-	        path: '.',
-	        findUp: true
-	      }
-	    }
-	}
+	configName: ".s3releasenotes",
+	extensions: {
+	    'rc': null
+	  }
 });
 
 //load the package.json file for the project from the root dir
@@ -66,7 +63,11 @@ const loadProgramAppVersion = () => {
 
 //load and validate the config file
 const loadAndValidateConfig = (configFilePath) => {
-	config = require(configFilePath);
+	try{
+		config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+	}catch(e){
+		Utils.fatalError(`Unable to load config file at ${configFilePath}!`);
+	}
 	if(!config.s3Bucket) Utils.fatalError("Invalid config file - no s3_bucket specified!");
 };
 
@@ -90,8 +91,8 @@ const invoke = (env) => {
 	let opts = {
 		awsAccessKeyId: program.aws_access_key_id || process.env.AWS_ACCESS_KEY_ID,
 		awsSecretKey: program.aws_secret_access_key || process.env.AWS_SECRET_ACCESS_KEY,
-		appVersion: program.appversion,
-		data: program.date
+		version: program.appversion,
+		date: program.date
 	};
 
 	if(!opts.awsAccessKeyId || !opts.awsSecretKey) Utils.fatalError("Missing/invalid AWS access credentials supplied!");

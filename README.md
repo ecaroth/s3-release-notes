@@ -11,11 +11,11 @@ Installation
 -----
 This library requires you to be using NPM in your project. To install simply run `npm install s3-release-notes` in your project's root directory. 
 
-NPM creates a run task (which is made available via CLI from NPMs process of creating a symlink to the folder in `node_modules/.bin`.
+NPM creates a run task (which is made available via CLI from NPMs process of creating a symlink to the folder in `node_modules/.bin`, allowing you to do `npm run <task>` for dependency tasks. You can also modify your `$PATH` with _direnv_ to run the CLI command directly by adding `PATH=$PATH:./node_modules/.bin`
 
 Configuration
 -----
-To use release notes, you must have a config file present in your project's root directory, named `s3ReleaseNotes.json` with the following format
+To use release notes, you must have a config file present in your project's root directory, named `.s3releasenotesrc` with the following format
 ```javascript
 { 
     "s3Bucket": "my-s3-bucket", 
@@ -62,7 +62,7 @@ All commands that make changes to the version.json file include terminal prompts
 # s3-release-notes remove --appversion 1.4.5
 ```
 ```
-# npm run s3-release-notes list --aws_access_key_id "FOO" --aws_secret_access_key "BAR"
+# s3-release-notes list --aws_access_key_id "FOO" --aws_secret_access_key "BAR"
 ```
 
 Consumer
