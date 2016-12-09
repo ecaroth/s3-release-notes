@@ -6,9 +6,9 @@ const 	Liftoff = require('liftoff'),
 	  	fs = require('fs');
 
 
-const	packageJson = require('../package.json'), 		//s3-release-note app's package json defs
-		appRootDir = require('app-root-dir').get(),		//root dir of the user's app
-		availableCommands = Object.freeze([				//commands supported by the CLI
+const	packageJson = require('../package.json'), 			//s3-release-note app's package json defs
+		appRootDir = require('app-root-path').path,			//root dir of the user's app
+		availableCommands = Object.freeze([					//commands supported by the CLI
 			'release',
 			'preview',
 			'current',
@@ -53,7 +53,7 @@ const s3ReleaseNotes = new Liftoff({
 //load the package.json file for the project from the root dir
 const loadProgramAppVersion = () => {
 	try{
-		let packageJson = require( path.relative(__dirname, appRootDir + "/package.json"));
+		var packageJson = require( path.relative(__dirname, appRootDir + "/package.json"));
 	}catch(e){
 		Utils.fatalError("No package.json file in project root!");
 	}

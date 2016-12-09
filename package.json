@@ -11,8 +11,7 @@
   "bin": {
     "s3-release-notes": "bin/cli.js"
   },
-  "dependencies": {
-    "app-root-dir": "^1.0.2",
+  "devDependencies": {
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "editor": "^1.0.0",
@@ -21,6 +20,7 @@
     "marked-terminal": "^2.0.0",
     "prompt": "^1.0.0",
     "s3fs": "^2.5.0",
-    "semver": "^5.3.0"
+    "semver": "^5.3.0",
+    "app-root-path": "^2.0.1"
   }
 }
