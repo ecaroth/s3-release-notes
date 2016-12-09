@@ -1,6 +1,7 @@
 "use strict";
 
-const 	S3FS = require('s3fs'),
+const 	path = require('path'),
+		S3FS = require('s3fs'),
 		Semver = require('semver');
 
 const 	VERSIONS_FILE = "versions.json",
@@ -69,9 +70,22 @@ exports.create = (config, awsKey, awsSecret) => {
 
 		current = data.current;
 
-		fs.writeFile(_key_for_version_file(), JSON.stringify(data), function (err) {
-			cb(err);
-		});
+		if(fs.s3){
+			//TODO - remvoe this once s3fs supports using underlying s3 file upload (w/ advanced perms)
+			var params = {
+				Bucket: fs.bucket, 
+				Key: path.join(fs.path, _key_for_version_file()), 
+				Body: JSON.stringify(data),
+				ACL: 'public-read'
+			};
+			fs.s3.upload(params, function(err, data) {
+				return cb(err);
+			});
+		}else{
+			fs.writeFile(_key_for_version_file(), JSON.stringify(data), function (err) {
+				cb(err);
+			});
+		}
 	}
 
 	function _remove(version, cb){

@@ -69,9 +69,8 @@ Consumer
 -----
 In your applications, you can include the file `src/s3-release-notes.js` and get an instance of the consumer object.
 ```javascript
-s3ReleaseNotes("https://my-bucket.s3.amazonaws.com/", function(s3ReleaesNotesInstance){
-	//do whatever with s3ReleaseNotesInstance
-    //NOTE - will be null if no versions.json file @ supplied URL
+s3ReleaseNotes("https://my-bucket.s3.amazonaws.com/", function(loaded, s3ReleaesNotesInstance){
+	//do whatever with s3ReleaseNotesInstance (will be null if !loaded)
 });
 ``` 
 The consumer instance object exposes the following functions:
@@ -80,7 +79,7 @@ The consumer instance object exposes the following functions:
 Get the current released version of the application
 
 #### .getVersions()
-Get the full list of all released versions
+Get the full list of all released versions (in array with each in format from `.getVersionInfo()` below)
 
 #### .getVersionInfo(version)
 Get information for the specified version in the format `{version:"1.2.3", notes: "markup release notes", date: "2016-0101"}`
