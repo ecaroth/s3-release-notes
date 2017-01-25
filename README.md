@@ -30,7 +30,7 @@ CLI
 -----
 The cli is used as:
 ```
-s3-releaes-notes <command> [options]
+s3-release-notes <command> [options]
 ```
 Available commands are:
 
