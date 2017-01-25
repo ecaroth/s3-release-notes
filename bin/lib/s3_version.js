@@ -76,7 +76,9 @@ exports.create = (config, awsKey, awsSecret) => {
 				Bucket: fs.bucket, 
 				Key: path.join(fs.path, _key_for_version_file()), 
 				Body: JSON.stringify(data),
-				ACL: 'public-read'
+				ACL: 'public-read',
+				CacheControl: 'public, must-revalidate, proxy-revalidate, max-age=0',
+				Expires: 0
 			};
 			fs.s3.upload(params, function(err, data) {
 				return cb(err);

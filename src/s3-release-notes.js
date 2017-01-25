@@ -67,7 +67,7 @@
 
 	function create(s3BucketURL, cb){
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', s3BucketURL + "/versions.json");
+		xhr.open('GET', s3BucketURL + "/versions.json?nocache="+(new Date().getTime()));
 		xhr.onload = function() {
 		    if (xhr.status === 200) {
 		    	var data = JSON.parse(xhr.responseText);
