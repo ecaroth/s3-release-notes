@@ -77,6 +77,7 @@ exports.create = (config, awsKey, awsSecret) => {
                 Key: path.join(fs.path, _key_for_version_file()), 
                 Body: JSON.stringify(data),
                 ACL: 'public-read',
+                ContentType: 'application/json',
                 CacheControl: 'public, must-revalidate, proxy-revalidate, max-age=0',
                 Expires: 0
             };

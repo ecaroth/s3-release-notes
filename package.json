@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "colors": "^1.1.2",
-    "commander": "^2.9.0",
+    "commander": "^2.19.0",
     "editor": "^1.0.0",
     "liftoff": "^2.3.0",
     "marked": "^0.3.6",
